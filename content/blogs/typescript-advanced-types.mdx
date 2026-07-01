@@ -1,0 +1,86 @@
+---
+title: "TypeScript 高级类型技巧"
+date: "2024-06-20"
+tags: ["TypeScript", "前端"]
+series: "深入理解 React 原理"
+seriesOrder: 1
+excerpt: "从泛型到条件类型再到模板字面量类型，探索 TypeScript 类型系统的高级用法"
+---
+
+## 泛型基础
+
+泛型是 TypeScript 类型系统的基石，允许我们在定义时保留类型信息：
+
+```
+function identity<T>(arg: T): T {
+  return arg;
+}
+
+const result = identity<string>("hello");  // result: string
+const inferred = identity(42);             // inferred: number
+```
+
+### 泛型约束
+
+使用 `extends` 关键字约束泛型参数：
+
+```
+interface HasLength {
+  length: number;
+}
+
+function logLength<T extends HasLength>(arg: T): T {
+  console.log(arg.length);
+  return arg;
+}
+
+logLength("hello");    // OK
+logLength([1, 2, 3]); // OK
+```
+
+## 条件类型
+
+条件类型允许根据类型关系进行类型选择：
+
+```
+type IsString<T> = T extends string ? true : false;
+
+type A = IsString<"hello">;  // true
+type B = IsString<42>;       // false
+```
+
+### `infer` 关键字
+
+`infer` 在条件类型中提取类型：
+
+```
+type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+
+type Fn = (x: number) => string;
+type R = ReturnType<Fn>;  // string
+```
+
+## 映射类型
+
+```
+type Readonly<T> = {
+  readonly [K in keyof T]: T[K];
+};
+
+type Optional<T> = {
+  [K in keyof T]?: T[K];
+};
+```
+
+### 模板字面量类型
+
+TypeScript 4.1 引入的模板字面量类型让字符串类型也变得灵活：
+
+```
+type EventName<T extends string> = `on${Capitalize<T>}`;
+type ClickEvent = EventName<"click">;  // "onClick"
+```
+
+## 总结
+
+TypeScript 的类型系统图灵完备，掌握这些高级技巧能让代码的类型安全性大幅提升。在实际开发中，合理运用条件类型和映射类型能显著减少重复代码。

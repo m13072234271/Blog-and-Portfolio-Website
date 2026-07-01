@@ -1,0 +1,58 @@
+---
+title: "RISC-V 处理器设计与实现"
+date: "2024-06-01"
+tags: ["RISC-V", "Verilog", "FPGA", "硬件"]
+excerpt: "从零开始设计一个支持 RV32I 指令集的五级流水线 RISC-V 处理器，涵盖架构设计、Verilog 实现与仿真验证"
+---
+
+## 概述
+
+本项目实现了一个支持 **RV32I 指令集** 的 RISC-V 处理器，采用经典的五级流水线架构，使用 SystemVerilog 编写，并在 FPGA 上进行了验证。
+
+## 架构设计
+
+### 五级流水线
+
+处理器采用经典的五级流水线结构：
+
+1. **IF (Instruction Fetch)**: 从指令存储器读取指令
+2. **ID (Instruction Decode)**: 译码并读取寄存器
+3. **EX (Execute)**: ALU 运算或地址计算
+4. **MEM (Memory)**: 数据存储器读写
+5. **WB (Write Back)**: 结果写回寄存器
+
+### 数据通路
+
+```
+PC → IMem → RegFile → ALU → DMem → WB
+```
+
+指令从 PC 指向的地址取出，经过译码后从寄存器堆读取操作数，ALU 执行运算，结果可选地写回寄存器。
+
+## 关键模块
+
+### 控制单元
+
+控制单元根据指令的 opcode、funct3、funct7 生成各流水级的控制信号：
+
+- `RegWrite`: 是否写回寄存器
+- `ALUSrc`: ALU 操作数选择
+- `MemWrite` / `MemRead`: 存储器控制
+- `Branch`: 分支指令标识
+
+### ALU
+
+支持 RV32I 所需的所有算术和逻辑操作：ADD、SUB、AND、OR、XOR、SLL、SRL、SRA、SLT、SLTU。
+
+## 仿真验证
+
+使用 Vivado Simulator 对设计进行了完整的波形仿真，覆盖了所有 RV32I 指令。编写了汇编测试程序验证：
+
+- 算术逻辑指令的正确性
+- Load/Store 指令的内存访问
+- 分支和跳转指令的控制流
+- 流水线冒险处理
+
+## 项目产出
+
+完整的设计代码和仿真脚本均已开源，包含 RTL 设计文件、测试程序和仿真环境。
